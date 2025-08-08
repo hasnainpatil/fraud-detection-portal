@@ -40,76 +40,68 @@ Brief overview of current progress and key findings.
 - Azure Student Credits: [Current usage]
 - Compute hours: [Tracking needed]
 
-Progress Report – August 8, 2025 
+# Progress Report – August 8, 2025
 
-Baseline Modeling & Hyperparameter Tuning:
+## Baseline Modeling & Hyperparameter Tuning
 
-LightGBM selected for initial model due to speed and performance on tabular, imbalanced data
+- **Model Choice:**  
+  - *LightGBM* selected for initial modeling due to speed and strong performance on tabular, imbalanced data.
+- **Experiment Tracking:**  
+  - All experiments tracked in `eda-and-baseline-model.ipynb` notebook.
 
-All experiments tracked in eda-and-baseline-model.ipynb notebook
+---
 
-Current Model — Parameters (Finalized for Progression)
-Algorithm:
+## Current Model — Parameters (Finalized for Progression)
 
-LightGBM (v4.6.0)
+**Algorithm:**  
+- LightGBM (v4.6.0)
 
-Key Hyperparameters:
+**Key Hyperparameters:**
+- `learning_rate`: **0.01**  
+  - Lowered for finer-grained, stable training
+- `num_boost_round`: **1000**  
+  - High to allow enough rounds for learning, with early stopping for efficiency
+- `scale_pos_weight`: **577.88**  
+  - Matches the ratio of legitimate to fraud cases to combat class imbalance
+- `early_stopping_rounds`: **20**  
+  - Training stops if validation scores do not improve for 20 rounds
+- `valid_sets`: `[train, test]`  
+  - Monitors performance on both training and validation data
+- `log_evaluation`: **period=10**  
+  - Logs metrics every 10 rounds for transparency
 
-learning_rate: 0.01
+---
 
-Lowered for finer-grained, stable training
+## Performance Metrics (Latest Model)
 
-num_boost_round: 1000
+- **ROC-AUC:** `0.90`
+- **Fraud Recall:** `85.7%`
+- **Fraud Precision:** `9.5%`
+- **F1-score (fraud):** `0.17`
 
-High to allow enough rounds for learning, with early stopping for efficiency
+**Confusion Matrix:**
+[[56066 798]
+[ 14 84]]
 
-scale_pos_weight: 577.88
 
-Matches the ratio of legit to fraud cases to combat class imbalance
+---
 
-early_stopping_rounds: 20
+### Interpretation
 
-Model stops training if validation scores do not improve for 20 rounds
+- **High recall** ensures most frauds are detected.
+- **Precision is low,** which aligns with real-world tradeoffs and business priorities in fraud detection.
+- **ROC-AUC above industry standard,** confirming strong overall discrimination ability.
 
-valid_sets: [train, test]
+---
 
-Monitors performance on both training and validation data
+## Key Decisions and Rationale
 
-log_evaluation: period=10
+- **SMOTE/Oversampling:**  
+  - Considered, but set aside for now to retain original data characteristics; may revisit if recall stalls.
 
-Logs metrics every 10 rounds for transparency
+- **Threshold Setting:**  
+  - Lower threshold adopted to maximize recall for minority class (fraud), accepting lower precision.
 
-Performance Metrics (Latest Model):
-ROC-AUC: 0.90
+- **Business Alignment:**  
+  - Chosen metrics prioritize fraud detection (**high recall**) for demo and interview purposes, matching domain expectations.
 
-Fraud Recall: 85.7%
-
-Fraud Precision: 9.5%
-
-F1-score (fraud): 0.17
-
-Confusion Matrix:
-
-text
-[[56066   798]
- [   14    84]]
-Interpretation:
-
-High recall ensures most frauds are detected
-
-Precision is low, but aligns with real-world tradeoffs and business priorities
-
-ROC-AUC above industry standard, confirming strong overall discrimination
-
-Key Decisions and Rationale
-SMOTE/Oversampling:
-
-Considered but set aside for now to retain original data characteristics; may revisit if recall stalls
-
-Threshold Setting:
-
-Lower threshold adopted to maximize recall for minority class (fraud), accepting lower precision
-
-Business Alignment:
-
-Chosen metrics prioritize fraud detection (high recall) for demo and interview purposes, matching domain expectations
