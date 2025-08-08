@@ -39,3 +39,77 @@ Brief overview of current progress and key findings.
 ## Resources Used
 - Azure Student Credits: [Current usage]
 - Compute hours: [Tracking needed]
+
+Progress Report – August 8, 2025 
+
+Baseline Modeling & Hyperparameter Tuning:
+
+LightGBM selected for initial model due to speed and performance on tabular, imbalanced data
+
+All experiments tracked in eda-and-baseline-model.ipynb notebook
+
+Current Model — Parameters (Finalized for Progression)
+Algorithm:
+
+LightGBM (v4.6.0)
+
+Key Hyperparameters:
+
+learning_rate: 0.01
+
+Lowered for finer-grained, stable training
+
+num_boost_round: 1000
+
+High to allow enough rounds for learning, with early stopping for efficiency
+
+scale_pos_weight: 577.88
+
+Matches the ratio of legit to fraud cases to combat class imbalance
+
+early_stopping_rounds: 20
+
+Model stops training if validation scores do not improve for 20 rounds
+
+valid_sets: [train, test]
+
+Monitors performance on both training and validation data
+
+log_evaluation: period=10
+
+Logs metrics every 10 rounds for transparency
+
+Performance Metrics (Latest Model):
+ROC-AUC: 0.90
+
+Fraud Recall: 85.7%
+
+Fraud Precision: 9.5%
+
+F1-score (fraud): 0.17
+
+Confusion Matrix:
+
+text
+[[56066   798]
+ [   14    84]]
+Interpretation:
+
+High recall ensures most frauds are detected
+
+Precision is low, but aligns with real-world tradeoffs and business priorities
+
+ROC-AUC above industry standard, confirming strong overall discrimination
+
+Key Decisions and Rationale
+SMOTE/Oversampling:
+
+Considered but set aside for now to retain original data characteristics; may revisit if recall stalls
+
+Threshold Setting:
+
+Lower threshold adopted to maximize recall for minority class (fraud), accepting lower precision
+
+Business Alignment:
+
+Chosen metrics prioritize fraud detection (high recall) for demo and interview purposes, matching domain expectations
