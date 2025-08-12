@@ -186,3 +186,50 @@ The retrained model's performance was evaluated on the unseen test set, confirmi
 
 These metrics confirm the model's high effectiveness, correctly identifying **~90% of actual fraud cases** (Recall) while demonstrating excellent overall discriminative power (AUC of ~0.98).
 
+# Documentation: Model Insights & Behavior
+
+This document explains the key behaviors and performance characteristics of the trained fraud detection model. Understanding these nuances is critical for interpreting its predictions and appreciating its real-world application.
+
+---
+
+### 1. The Precision-Recall Trade-off
+
+The primary goal of this model is to catch as many fraudulent transactions as possible. This means we prioritize **high recall**.
+
+* **Recall:** Our model achieves a recall of approximately **90%**. This means it successfully identifies 9 out of every 10 actual fraud cases in the dataset.
+* **Precision:** To achieve this high recall, the model is intentionally designed to be very suspicious. A side effect of this is lower precision. Our model's precision is **9%**, meaning that for every 10 transactions it flags as fraud, roughly 1 is actual fraud and the other 9 are false alarms (False Positives).
+
+This trade-off is a deliberate and standard practice in fraud detection, where the cost of missing a real fraud case is much higher than the cost of reviewing a false alarm.
+
+---
+
+### 2. The Role of the Prediction Threshold
+
+We convert the model's raw probability scores into a final "Fraud" or "Not Fraud" decision using a **prediction threshold**.
+
+* **Our Threshold:** We use a low threshold of `0.2`.
+* **The Logic:** This tells the model, "If you are even 20% suspicious that a transaction is fraudulent, flag it." This low setting is the direct cause of the high recall and low precision mentioned above.
+* **Business Alignment:** This "suspicion knob" is a business decision. A higher threshold (e.g., `0.9`) would result in fewer false alarms but would miss more real fraud. Our choice of `0.2` is optimized for minimizing missed fraud cases.
+
+---
+
+### 3. Understanding the Score Distribution
+
+When analyzing the model's output, it was observed that the high-probability scores were varied, while the low-probability scores for non-fraudulent transactions were often very similar and close to zero.
+
+This is expected and correct behavior.
+
+* **Normal Transactions:** The vast majority (~99.8%) of transactions are not fraudulent and share common characteristics. The model confidently assigns them all a similar, very low probability score.
+* **Fraudulent Transactions:** Fraudulent transactions are anomalous and differ from each other in unique ways. The model reflects this by assigning them a wider and more varied range of higher probability scores, reflecting their different levels of "suspiciousness."
+
+---
+
+### 4. How to Interpret the API Response
+
+The JSON response from the prediction API is designed to be comprehensive. It's important to understand the meaning of each key field.
+
+* `"Class"`: This field (`0` or `1`) is the **original, true label** from the input data. It is the "ground truth" and is included for easy comparison and validation. It is *not* a prediction from the model.
+* `"fraud_probability"`: This is the model's raw output—a score from 0.0 to 1.0 representing the calculated probability of fraud.
+* `"is_fraud_prediction"`: This is the model's final **yes/no decision**, derived by checking if the `fraud_probability` is greater than our `0.2` threshold.
+* `"sample_top_flagged"`: This is a list of the top 20 most suspicious transactions. By definition, every transaction in this list has been flagged by the model and will therefore always have an `"is_fraud_prediction"` value of `1`.
+
