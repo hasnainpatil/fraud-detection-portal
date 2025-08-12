@@ -72,7 +72,7 @@ Brief overview of current progress and key findings.
 
 ---
 
-## Performance Metrics (Latest Model)
+## Performance Metrics (Earlier Model)
 
 - **ROC-AUC:** `0.90`
 - **Fraud Recall:** `85.7%`
@@ -104,4 +104,85 @@ Brief overview of current progress and key findings.
 
 - **Business Alignment:**  
   - Chosen metrics prioritize fraud detection (**high recall**) for demo and interview purposes, matching domain expectations.
+
+# Troubleshooting Log: Resolving a Model Overfitting Incident
+
+**Date:** August 12, 2025
+
+**Author:** [Hasnain Patil]
+
+### 1. Incident Summary
+
+During local API testing, a critical issue was identified where the backend function, despite running without errors, returned the exact same `fraud_probability` score for every single transaction. This indicated that the model was not differentiating between inputs, rendering it ineffective.
+
+---
+
+### 2. Investigation & Root Cause Analysis
+
+The investigation followed a systematic, two-step process to isolate the fault between the application code and the ML model itself.
+
+**Step 1: Validate the Application Code**
+
+The first hypothesis was that the Python code in our Azure Function was failing to process the input data correctly. To test this, we added `logging` statements to inspect the `pandas` DataFrame immediately before it was passed to the model for prediction.
+
+* **Action:** Logged the `.shape` and `.head()` of the input DataFrame.
+* **Result:** The logs confirmed the DataFrame had the correct dimensions and contained varied, valid numerical data.
+* **Conclusion:** This step successfully **ruled out the application code as the source of the error**. The problem was isolated to the `model.txt` artifact itself.
+
+**Step 2: Analyze the Model Training Logs**
+
+With the focus shifted to the model artifact, the original training notebook logs were reviewed. The root cause was identified as a classic case of **severe overfitting**.
+
+* **Finding:** The initial training log showed the message: `Early stopping, best iteration is: [1]`.
+* **Analysis:** This meant the model had only trained for a **single round**. It had learned so aggressively on the training data that its performance on the unseen validation data immediately degraded, causing the `early_stopping` callback to halt the process. The resulting model was trivial and had not learned any generalizable patterns.
+
+---
+
+### 3. Resolution: Hyperparameter Tuning for Regularization
+
+The solution was to make the model less aggressive by introducing **regularization**—a set of techniques designed to prevent overfitting by adding constraints and randomness to the learning process. This was achieved by tuning the model's hyperparameters.
+
+The following key changes were made to the `params` dictionary before retraining:
+
+* **Reduced `learning_rate`:** Forced the model to take smaller, more conservative steps.
+* **Introduced `feature_fraction` and `bagging_fraction`:** In each training round, the model was now forced to learn from a random subset of both the features (columns) and the data (rows).
+* **Simplified Model Complexity (reduced `num_leaves`):** Limited the complexity of the individual decision trees, making it harder for them to memorize noise.
+
+---
+
+### 4. Validation & Outcome
+
+After implementing the new hyperparameters, the model was retrained successfully.
+
+* **Result:** The new training process ran for a healthy number of rounds (**29**), showing steady improvement on the validation set before stopping correctly.
+* **Final Test:** The newly generated `model.txt` was re-uploaded to Azure Storage. A final local test using `curl` confirmed the fix: the API now returned varied and sensible `fraud_probability` scores.
+* **Conclusion:** The incident was fully resolved, resulting in a robust and well-generalized model suitable for production.
+
+---
+
+### 5. Final Model Performance Metrics
+
+The retrained model's performance was evaluated on the unseen test set, confirming its effectiveness.
+
+* **ROC-AUC Score:** `0.978`
+
+* **Classification Report:**
+    ```
+                  precision    recall  f1-score   support
+
+               0     0.9998    0.9849    0.9923     56864
+               1     0.0930    0.8980    0.1686        98
+
+        accuracy                         0.9848     56962
+       macro avg     0.5464    0.9414    0.5804     56962
+    weighted avg     0.9983    0.9848    0.9909     56962
+    ```
+
+* **Confusion Matrix:**
+    ```
+    [[56006   858]
+     [   10    88]]
+    ```
+
+These metrics confirm the model's high effectiveness, correctly identifying **~90% of actual fraud cases** (Recall) while demonstrating excellent overall discriminative power (AUC of ~0.98).
 
