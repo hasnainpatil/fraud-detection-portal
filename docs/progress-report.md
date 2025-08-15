@@ -233,3 +233,45 @@ The JSON response from the prediction API is designed to be comprehensive. It's 
 * `"is_fraud_prediction"`: This is the model's final **yes/no decision**, derived by checking if the `fraud_probability` is greater than our `0.2` threshold.
 * `"sample_top_flagged"`: This is a list of the top 20 most suspicious transactions. By definition, every transaction in this list has been flagged by the model and will therefore always have an `"is_fraud_prediction"` value of `1`.
 
+# Troubleshooting Log: Resolving a Persistent Build Tool Failure
+
+**Date:** August 15, 2025
+
+**Author:** [Your Name]
+
+### 1. Incident Summary
+
+During the initial setup of the frontend project, a critical and persistent error occurred while trying to initialize Tailwind CSS. The standard command, `npx tailwindcss init -p`, repeatedly failed with an `npm ERR! could not determine executable to run` error. This failure blocked all progress on UI development.
+
+---
+
+### 2. Investigation & Root Cause Analysis
+
+The investigation followed an escalating series of steps to isolate the fault, proving that the issue was not with the project's code but with the development environment itself.
+
+* **Initial Fix Attempt (Clean Install):** A full "clean install" (`rm -rf node_modules`, `npm cache clean`, `npm install`) was performed. The error persisted, indicating the problem was not a corrupted dependency within the project.
+
+* **Environment-Level Fix (New Codespace):** To completely rule out a transient environmental corruption, the entire GitHub Codespace instance was deleted and a new one was created from the repository. The error remarkably persisted even on a pristine, brand-new instance.
+
+* **Runtime-Level Fix (Node.js Version Change):** Suspecting an incompatibility with the default Node.js version, `nvm` (Node Version Manager) was used to downgrade to the stable LTS (Long-Term Support) version. The error still persisted.
+
+* **Conclusion (Root Cause):** The failure of all standard resolution methods, even on a completely fresh Codespace, led to the conclusion that there is a fundamental incompatibility or bug within the specific combination of the GitHub Codespace base image and the `npm`/`npx` toolchain. The environment's package runner is fundamentally broken.
+
+---
+
+### 3. Resolution: Bypassing the Build Tool with a CDN
+
+To unblock development, a pragmatic decision was made to **bypass the faulty local build toolchain** for Tailwind CSS. Instead of installing it as an `npm` package, we integrated it directly via its **Play CDN**.
+
+* **Action:** All Tailwind-related `npm` packages were uninstalled. A single `<script>` tag pointing to the official Tailwind CDN was added to the main `index.html` file.
+
+* **Outcome:** This solution worked immediately. The browser successfully loaded the Tailwind library, and utility classes were correctly applied to the React components. Development was unblocked. While a local build process is preferred for a final production optimization, the CDN is a perfect and robust solution for development and for completing this project.
+
+---
+
+### Skill Spotlight: Pragmatism in Engineering
+
+This incident is a powerful example of **pragmatic problem-solving**. When a core tool in a development environment is fundamentally broken and cannot be fixed with standard methods, a skilled engineer does not remain blocked. They pivot to a viable alternative that achieves the same functional goal.
+
+By switching to the Tailwind CDN, we made a conscious trade-off: we sacrificed the "procedural purity" of a local build in favor of **forward progress**. This ability to adapt, think critically about the problem, and choose an effective alternative solution when the "correct" path is blocked is a crucial skill for any engineer.
+
