@@ -1,38 +1,58 @@
-Frontend Architecture: Component Hierarchy
-The frontend is built using React and follows a component-based architecture. Data flows unidirectionally from parent components to child components via props. The hierarchy is designed to separate concerns, making the application modular and maintainable.
+# 🏗️ Frontend Architecture: Component Hierarchy
 
-The component tree is as follows:
+The frontend is built with **React** and follows a modern, component-based architecture. This design promotes a clean separation of concerns and a unidirectional data flow (from parent to child components via props), making the application modular, scalable, and easy to maintain.
 
-App.jsx (Root Component)
+---
 
-Description: The main application component. It manages the overall application state (e.g., idle, loading, success, error), handles the API call to the backend, and holds the prediction results. It acts as the central controller for the entire UI.
+## Component Tree
 
-State Managed: status, results, threshold, selectedTransaction, etc.
+### 👑 `App.jsx` (Root Component)
 
-Dashboard.jsx
+> **Description:** This is the primary controller for the entire application. It manages the overall UI state, handles all communication with the backend API, and serves as the single source of truth for the prediction data.
 
-Description: A child of App. It receives the full list of predictions and the current threshold. Its sole responsibility is to display the high-level summary of the results.
+```js
+// State Managed:
+{
+  status: 'idle' | 'loading' | 'success' | 'error',
+  results: { ... },
+  threshold: 0.2,
+  selectedTransaction: { ... }
+}
 
-Props Received: predictions, threshold, onThresholdChange
+↳ Children of App.jsx
+📊 Dashboard.jsx
+Description: Receives the full list of predictions and the current threshold from App. Its sole responsibility is to display the high-level summary dashboard with statistics and interactive controls.
+
+// Props Received:
+{
+  predictions: [],
+  threshold: 0.2,
+  onThresholdChange: Function
+}
 
 Composes:
 
-StatCard.jsx: A small, reusable component to display a single statistic.
+StatCard.jsx: A small, reusable component for displaying a single statistic.
 
-ThresholdSlider.jsx: The interactive slider for adjusting the fraud threshold.
+ThresholdSlider.jsx: The interactive "Suspicion Knob" for adjusting the fraud threshold.
 
 Pie (from Chart.js): The chart for visualizing the fraud rate.
 
-ResultsTable.jsx
+📋 ResultsTable.jsx
+Description: Receives the prediction data and threshold from App. It filters this data on the client-side to display a sorted list of the top 20 most suspicious transactions. It also handles user clicks to select a row for detailed inspection.
 
-Description: A child of App. It receives the full list of predictions and the current threshold. It filters this data to display only the top 20 flagged transactions in a table. It also handles user clicks on rows.
+// Props Received:
+{
+  predictions: [],
+  threshold: 0.2,
+  onRowClick: Function,
+  selectedTransaction: { ... }
+}
 
-Props Received: predictions, threshold, onRowClick, selectedTransaction
+🔍 TransactionDetail.jsx
+Description: This component is only rendered when a user selects a transaction from the table. It receives the data for that single transaction and displays all of its features, visually highlighting any values that fall outside a predefined "normal" range to provide simple explainability.
 
-TransactionDetail.jsx
-
-Description: A child of App. It is conditionally rendered only when a user selects a transaction. It receives the data for a single transaction and displays all of its features, highlighting any that fall outside a predefined "normal" range.
-
-Props Received: transaction
-
-This structure ensures a clean separation of concerns, where the main App component handles all logic and data fetching, and the child components are primarily responsible for rendering specific parts of the UI.
+// Props Received:
+{
+  transaction: { ... }
+}
