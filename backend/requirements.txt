@@ -1,0 +1,5 @@
+azure-functions
+pandas
+scikit-learn
+lightgbm
+azure-storage-blob
