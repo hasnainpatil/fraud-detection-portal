@@ -21,11 +21,11 @@ The entire system is built on a serverless, event-driven architecture and incorp
 
 ## Key Features
 
-* **Interactive Dashboard:** Visualizes prediction results with summary cards and a dynamic pie chart.
-* **Real-Time Prediction Thresholding:** An interactive "Suspicion Knob" slider allows users to adjust the model's fraud threshold and see the impact on the flagged transaction count in real-time, visually demonstrating the precision-recall trade-off.
-* **Prediction Explainability:** A detail view for flagged transactions highlights the specific features that deviated from the "normal" range, providing simple, rule-based explanations for the model's predictions.
-* **Drag-and-Drop File Upload:** A modern, user-friendly interface for uploading transaction data.
-* **Serverless Backend:** A highly scalable and cost-effective API built with Azure Functions that serves the ML model.
+- **Interactive Dashboard:** Visualizes prediction results with summary cards and a dynamic pie chart.
+- **Real-Time Prediction Thresholding:** An interactive "Suspicion Knob" slider allows users to adjust the model's fraud threshold and see the impact on the flagged transaction count in real-time, visually demonstrating the precision-recall trade-off.
+- **Prediction Explainability:** A detail view for flagged transactions highlights the specific features that deviated from the "normal" range, providing simple, rule-based explanations for the model's predictions.
+- **Drag-and-Drop File Upload:** A modern, user-friendly interface for uploading transaction data.
+- **Serverless Backend:** A highly scalable and cost-effective API built with Azure Functions that serves the ML model.
 
 ## Technology Stack
 
@@ -41,20 +41,20 @@ The entire system is built on a serverless, event-driven architecture and incorp
 
 ## Architecture
 
-*(This is a great place to add a simple architecture diagram showing how the components interact: React App -> Azure Function -> Blob Storage)*
-
 The application follows a decoupled, three-tier architecture:
 1.  **Frontend:** A static React single-page application (SPA) provides the user interface. It is responsible for all client-side logic and rendering.
 2.  **Backend:** A serverless Azure Function acts as the API gateway. It receives user data, loads the ML model from storage, performs inference, and returns the prediction results.
 3.  **ML Model Storage:** The trained LightGBM model artifact is stored in Azure Blob Storage, decoupling it from the application code for independent updates and versioning.
 
+**[► View Detailed Frontend Architecture](./docs/FRONTEND_ARCHITECTURE.md)**
+
 ## Technical Highlights & Lessons Learned
 
 This project involved solving several real-world engineering challenges:
 
-* **Model Overfitting:** Diagnosed and resolved a severe overfitting issue by applying regularization techniques (hyperparameter tuning), which was confirmed by analyzing the model's performance metrics (AUC, Precision, Recall).
-* **Infrastructure Debugging:** Troubleshooted a persistent platform-level failure by isolating the issue to the hosting plan (`Flex Consumption` vs. `Consumption`) and re-provisioning the infrastructure on a more stable service tier.
-* **API Contract Versioning:** Resolved a full-stack integration issue by identifying a mismatch between the data format expected by the frontend and the one served by the backend, demonstrating the importance of maintaining a consistent API contract.
+- **Model Overfitting:** Diagnosed and resolved a severe overfitting issue by applying regularization techniques (hyperparameter tuning), which was confirmed by analyzing the model's performance metrics (AUC, Precision, Recall).
+- **Infrastructure Debugging:** Troubleshooted a persistent platform-level failure by isolating the issue to the hosting plan (`Flex Consumption` vs. `Consumption`) and re-provisioning the infrastructure on a more stable service tier.
+- **API Contract Versioning:** Resolved a full-stack integration issue by identifying a mismatch between the data format expected by the frontend and the one served by the backend, demonstrating the importance of maintaining a consistent API contract.
 
 ## How to Run Locally
 
