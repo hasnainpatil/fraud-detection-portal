@@ -2,16 +2,8 @@
 
 **An end-to-end, cloud-native web application that provides real-time fraud predictions for credit card transactions, built with a production-minded MLOps approach on Microsoft Azure.**
 
----
-
-### ► [Live Demo Link](https://your-live-app-url.azurewebsites.net) 
-
-*(Replace with the URL of your deployed React app, which will be an Azure Static Web App)*
-
----
-
 ![Demo GIF](https://github.com/hasnainpatil/fraud-detection-portal/blob/main/frontend/_assets/frauddetection.gif?raw=true) 
-*(It's highly recommended to record a short GIF of your app in action and embed it here.)*
+
 
 ## Overview
 
