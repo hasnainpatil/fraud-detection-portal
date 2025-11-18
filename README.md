@@ -10,7 +10,7 @@
 
 ---
 
-![Demo GIF](https://your-link-to-a-demo-gif.com) 
+![Demo GIF](https://github.com/hasnainpatil/fraud-detection-portal/blob/main/frontend/_assets/frauddetection.gif?raw=true) 
 *(It's highly recommended to record a short GIF of your app in action and embed it here.)*
 
 ## Overview
